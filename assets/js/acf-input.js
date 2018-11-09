@@ -3493,8 +3493,8 @@
 		},
 		
 		events: {
-			'change .acf-field':	'startListening',
-			'submit form':			'stopListening'
+			'change form .acf-field':	'startListening',
+			'submit form':				'stopListening'
 		},
 				
 		reset: function(){
@@ -3889,7 +3889,7 @@
 			this.$hide().prop('checked', true);
 			
 			// Show postbox
-			this.$el.show();
+			this.$el.show().removeClass('acf-hidden');
 		},
 		
 		enable: function(){
@@ -3907,7 +3907,7 @@
 			this.$hideLabel().hide();
 			
 			// Hide postbox
-			this.$el.hide();
+			this.$el.hide().addClass('acf-hidden');
 		},
 		
 		disable: function(){
@@ -12576,6 +12576,9 @@
 				success: onSuccess,
 				complete: onComplete
 			});
+			
+			// return false to fail validation and allow AJAX
+			return false
 		},
 		
 		/**
@@ -12847,6 +12850,7 @@
 		events: {
 			'click input[type="submit"]':	'onClickSubmit',
 			'click button[type="submit"]':	'onClickSubmit',
+			'click #editor .editor-post-publish-button': 'onClickSubmitGutenberg',
 			'click #save-post':				'onClickSave',
 			'mousedown #post-preview':		'onClickPreview', // use mousedown to hook in before WP click event
 			'submit form':					'onSubmit',
@@ -13030,6 +13034,34 @@
 			// added a custom 'submit.edit-post' event which causes the input buttons to become disabled.
 			// remove this event to prevent UX issues.
 			$('form#post').off('submit.edit-post');
+		},
+		
+		/**
+		*  onClickSubmitGutenberg
+		*
+		*  Custom validation event for the gutenberg editor.
+		*
+		*  @date	29/10/18
+		*  @since	5.7.8
+		*
+		*  @param	object e The event object.
+		*  @param	jQuery $el The input element.
+		*  @return	void
+		*/
+		onClickSubmitGutenberg: function( e, $el ){
+			
+			// validate
+			var valid = acf.validateForm({
+				form: $('#editor'),
+				event: e,
+				reset: true
+			});
+			
+			// if not valid, stop event and allow validation to continue
+			if( !valid ) {
+				e.preventDefault();
+				e.stopImmediatePropagation();
+			}
 		},
 		
 		/**
