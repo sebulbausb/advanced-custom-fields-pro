@@ -20,25 +20,35 @@ class ACF_Form_Gutenberg {
 		
 	function __construct() {
 		
-		// Modify metaboxes for Gutenberg.
-		add_filter( 'filter_gutenberg_meta_boxes', 		array($this, 'filter_gutenberg_meta_boxes'), 99, 1 );
-		add_filter( 'filter_block_editor_meta_boxes', 	array($this, 'filter_gutenberg_meta_boxes'), 99, 1 );
+		// filters
+		add_filter( 'replace_editor', array($this, 'replace_editor'), 99, 2 );
 	}
 	
+	
 	/**
-	*  filter_gutenberg_meta_boxes
+	*  replace_editor
 	*
-	*  description
+	*  Check if Gutenberg is replacing the editor.
 	*
-	*  @date	6/11/18
-	*  @since	5.8.0
+	*  @date	13/2/18
+	*  @since	5.6.9
 	*
-	*  @param	type $var Description. Default.
-	*  @return	type Description.
+	*  @param	boolean $replace True if the editor is being replaced by Gutenberg.
+	*  @param	object $post The WP_Post being edited.
+	*  @return	boolean
 	*/
-	function filter_gutenberg_meta_boxes( $wp_meta_boxes) {
-		add_action('admin_footer', array($this, 'admin_footer'));
-		return $wp_meta_boxes;
+	
+	function replace_editor( $replace, $post ) {
+		
+		// check if Gutenberg is replacing
+		if( $replace ) {
+			
+			// actions
+			add_action('admin_footer', array($this, 'admin_footer'));
+		}
+		
+		// return
+		return $replace;
 	}
 	
 	/**
@@ -52,6 +62,7 @@ class ACF_Form_Gutenberg {
 	*  @param	n/a
 	*  @return	n/a
 	*/
+	
 	function admin_footer() {
 		
 		// edit_form_after_title is not run due to missing action, call this manually
